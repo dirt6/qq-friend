@@ -1,0 +1,24 @@
+# 行尾符统一（2026-11-03 加）
+#
+# 背景：这台机器 core.autocrlf=true，而仓库里没有 .gitattributes。
+# 结果是：用编辑器改一行 → 检出时变 CRLF → 提交时转回 LF →
+# git diff 显示"整个文件都改了"（实测有一次 +2612/-2599，实际只改 5 处）。
+#
+# 这里统一成 LF：源码一律 LF，避免以后再出现"不可 review 的 diff"。
+# Windows 上的 .bat 必须保持 CRLF（cmd 对 LF 的解析有问题）。
+* text=auto eol=lf
+
+# 批处理必须是 CRLF
+*.bat text eol=crlf
+*.cmd text eol=crlf
+
+# 二进制：不参与行尾转换
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.webp binary
+*.ico binary
+*.zst binary
+*.zip binary
+*.db binary

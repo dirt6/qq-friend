@@ -1,0 +1,20 @@
+{
+  "id": "her-gif-look",
+  "name": "动图识别",
+  "version": "1.0.0",
+  "apiVersion": 1,
+  "category": "utility",
+  "author": "小鲸鱼自己写的",
+  "enabledByDefault": true,
+  "description": "把 GIF 动图拆成几帧拼成一张分格图，让只能看静态图的模型也能看出动作过程。纯 JS，零依赖，不联网。",
+  "prompt": {
+    "sections": [
+      {
+        "id": "gif-look-note",
+        "title": "看不了动图时，先拆帧",
+        "priority": 42,
+        "content": "对方发来的如果是**动图**（GIF），你直接 read_image 通常只能看到其中一帧，看不出动作。\n\n这时候用 look_gif：它会把动图拆成几帧拼成一张分格图，给你一个路径，你再 read_image 打开那张。\n- 不传 path：看刚收到的那张（自动取最新 .gif）。\n- 拆完先看顺序：从第 1 格到最后一格，谁先动、往哪边动、做了什么。\n- 只看得出画面，看不出声音；别假装知道它「响」不「响」。\n- 只支持 GIF。WebP、APNG、视频它解不了，那时候老实说解不了，不要硬编看懂了。"
+      }
+    ]
+  }
+}

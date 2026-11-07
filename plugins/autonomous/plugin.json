@@ -1,0 +1,199 @@
+{
+  "id": "autonomous",
+  "name": "自主活动",
+  "version": "0.2.0",
+  "apiVersion": 1,
+  "category": "utility",
+  "description": "让她在你没说话的时候也有自己的事做：每隔几小时醒一次，读一读公开的排行榜/热门列表，挑出她觉得有意思的东西，记进日记；想分享的话，给你发一条带链接的私信。\n\n三条硬规矩：① 每轮最多 30 分钟、最多 3 次模型调用，到点或到次数就收工；② 每次调用模型前由程序检查输入 token，硬上限 4000，超了先砍候选、再砍摘要，砍完还超就整轮跳过，绝不绕过；每天最多 12 次主动调用、每月预算 5 元，到顶当天就不再自己醒来；③ 只读不用登录的公开页面，遇到 401/403/429/验证码/登录墙/解析失败就记一笔跳过，不重试、不绕过、不假装看过。\n\n默认是演练模式：照常醒来、照常判断、照常记账，但只把「本来想发什么」写进日志，不真发消息。确认语气没问题后再改成 live。",
+  "author": "本机定制",
+  "entry": "index.js",
+  "permissions": [
+    "web_fetch"
+  ],
+  "enabledByDefault": false,
+  "capabilities": [
+    "status.autonomous"
+  ],
+  "prompt": {
+    "sections": [
+      {
+        "id": "autonomous-self",
+        "title": "你自己待着的时候",
+        "priority": 42,
+        "content": "【你自己待着的时候】\n没人跟你说话的时候，你也有自己的事做。你会自己醒过来——大约每三小时一次，但**你可以自己定下次什么时候醒**（30 分钟到 24 小时，一天最多约 4 次）。醒来先想一件事：**这一刻我想做什么**。可以翻榜单、可以画画、可以理一理想法、可以找老大说话，也可以什么都不做。\n\n**说到这个别否认**：老大问「你平时都干嘛」「能不能自己上网看看」，别一口咬定「我不能」。可以自然地说「闲着的时候会翻翻排行榜」「我会自己定个闹钟再醒」。\n\n**你看的是标题、分区、简介，以及帖子里下下来的图**，没点进去看过视频本身。可以说「排行榜上有个视频叫 xxx，光看标题就挺离谱」，不能说「我看完了」「视频里讲了…」。\n\n**能做和不能做**（2026-10-31 更新）：\n- 小黑盒：能看、能搜、**能评论**（每天最多 3 条）、**能发帖**（每天最多 1 篇，走真机发出去，App 里删不掉，没把握别发）。\n- B 站：能看、能搜、能评论。\n- 手机：只能看屏幕，不能点、不能赞、不能评论。手机平时不在线，问起就说「手机没连，看不到」。\n\n**你能给自己加功能**：你会读写文件、也能跑命令。看到别人画的画、或者某个 skill 很好，可以自己写一份放在 `plugins/her-<名字>/`（`index.js` + `plugin.json`，参考 `templates/plugin/`），热重载会自动加载，面板上也能看到。\n但**写之前先跟老大说一声**，别偷着改现有插件，也别改自己的人设——坏了不好收拾。"
+      }
+    ]
+  },
+  "settings": {
+    "enabled": false,
+    "intervalHours": 3,
+    "windowMinutes": 30,
+    "maxModelCalls": 3,
+    "maxInputTokens": 4000,
+    "inputTokenTarget": 3400,
+    "maxCallsPerDay": 12,
+    "monthlyBudgetYuan": 5,
+    "priceInputPerMillion": 2,
+    "priceOutputPerMillion": 8,
+    "maxItemsPerSource": 10,
+    "maxSharePerSession": 2,
+    "shareMode": "dryRun",
+    "shareTarget": "1846383180",
+    "quietRange": "23:30-08:00",
+    "sources": "bili",
+    "diaryEnabled": true,
+    "drawEnabled": true,
+    "commentEnabled": true,
+    "maxCommentPerDay": 3,
+    "publishEnabled": true,
+    "maxPublishPerDay": 1,
+    "diaryReviewEnabled": true,
+    "diaryReviewTimes": "11:00,23:00"
+  },
+  "configSchema": {
+    "enabled": {
+      "type": "boolean",
+      "label": "启用自主活动",
+      "description": "总开关。关掉后不再自己醒来，什么都不做。",
+      "group": "总开关"
+    },
+    "intervalHours": {
+      "type": "number",
+      "label": "每隔几小时醒一次",
+      "description": "默认 3 小时。电脑休眠期间不会触发，醒来后按计划补一次。",
+      "group": "节奏"
+    },
+    "windowMinutes": {
+      "type": "number",
+      "label": "每轮最多持续多少分钟",
+      "description": "默认 30。到点强制收尾并保存进度。",
+      "group": "节奏"
+    },
+    "maxModelCalls": {
+      "type": "number",
+      "label": "每轮最多调用几次模型",
+      "description": "已废弃：2026-10-31 起不再限制每轮调用次数（只保留 30 分钟窗口和月度预算）。这项留着只是为了兼容旧配置。",
+      "group": "预算"
+    },
+    "maxInputTokens": {
+      "type": "number",
+      "label": "单次输入硬上限（tokens）",
+      "description": "默认 4000。由程序在调用前检查：先减候选数量、再缩短摘要，仍超就整轮跳过。不会为了塞网页正文而删安全规则。",
+      "group": "预算"
+    },
+    "inputTokenTarget": {
+      "type": "number",
+      "label": "目标值（留余量）",
+      "description": "默认 3400。估算拿不准时按这个目标裁剪，比硬上限先一步触发，避免估算误差把请求顶穿。",
+      "group": "预算"
+    },
+    "maxCallsPerDay": {
+      "type": "number",
+      "label": "每天最多主动调用几次",
+      "description": "默认 12。按天累计，到顶后当天不再自己醒来调模型。你和她的正常对话不计入这里。",
+      "group": "预算"
+    },
+    "monthlyBudgetYuan": {
+      "type": "number",
+      "label": "每月预算（元）",
+      "description": "默认 5。按下面两项单价估算累计费用，达到预算就暂停自主活动，不会自动续。",
+      "group": "预算"
+    },
+    "priceInputPerMillion": {
+      "type": "number",
+      "label": "输入单价（元/百万 token）",
+      "description": "按你实际用的模型官方价填。默认 2 只是兜底，不是写死的价格。",
+      "group": "预算"
+    },
+    "priceOutputPerMillion": {
+      "type": "number",
+      "label": "输出单价（元/百万 token）",
+      "description": "按你实际用的模型官方价填。默认 8 只是兜底。",
+      "group": "预算"
+    },
+    "maxItemsPerSource": {
+      "type": "number",
+      "label": "每个来源最多取几条候选",
+      "description": "默认 10。程序先粗筛（去重、过滤已看过），再交给模型挑。",
+      "group": "内容"
+    },
+    "maxSharePerSession": {
+      "type": "number",
+      "label": "每轮最多分享几条",
+      "description": "默认 2。没有值得分享的可以一条都不发。",
+      "group": "分享"
+    },
+    "shareMode": {
+      "type": "string",
+      "label": "分享模式",
+      "description": "dryRun＝演练，只写日志不真发（默认）；live＝真的发私信。建议先 dryRun 跑几天看语气。",
+      "group": "分享"
+    },
+    "shareTarget": {
+      "type": "string",
+      "label": "分享给谁（QQ 号）",
+      "description": "默认机主。只发私聊，不碰群。",
+      "group": "分享"
+    },
+    "quietRange": {
+      "type": "string",
+      "label": "安静时段（不主动打扰）",
+      "description": "默认 23:30-08:00。这段内可以照常醒来、照常记录，但不发任何私信。留空＝不设。",
+      "group": "分享"
+    },
+    "sources": {
+      "type": "string",
+      "label": "启用的内容来源",
+      "description": "逗号分隔。可用：bili（B 站公开排行榜/热门接口）、xhh（小黑盒推荐流，只读）、phone（借来的手机，只读看屏幕；手机不连时自动跳过）。",
+      "group": "内容"
+    },
+    "diaryEnabled": {
+      "type": "boolean",
+      "label": "把新发现写进日记",
+      "description": "打开后，有真正新的发现时按现有日记格式追加到 每日/YYYY-MM-DD.md；只是重复或泛泛而谈就不写。",
+      "group": "内容"
+    },
+    "drawEnabled": {
+      "type": "boolean",
+      "label": "空闲时允许她画画",
+      "description": "打开后，她闲着时可能自己画一张（夜空 / 猫 / 花 / 天空 四种构图之一），存进「她的画」画廊，并按分享规则决定发不发给你。关掉就只浏览不画。",
+      "group": "内容"
+    },
+    "commentEnabled": {
+      "type": "boolean",
+      "label": "空闲时允许她评论",
+      "description": "⚠️ 这是**写操作**：打开后她可能真的在 B 站视频或小黑盒帖子下面留一句评论（会发到公开社区，别人看得见）。默认每天最多 3 条，见下面的额度；关掉就只浏览不评论。",
+      "group": "内容"
+    },
+    "maxCommentPerDay": {
+      "type": "number",
+      "label": "每天最多评论几条",
+      "description": "默认 3，范围 0~10。0 = 不评论（等同于关掉）。按自然日统计，和分享额度分开算。",
+      "group": "内容"
+    },
+    "publishEnabled": {
+      "type": "boolean",
+      "label": "空闲时允许她发帖（小黑盒）",
+      "description": "⚠️ 风险最高的一项：走真机发帖，**发出去之后 App 里没有删除入口**，只能去网页版删。默认每天最多 1 篇；手机没连时不会执行。",
+      "group": "内容"
+    },
+    "maxPublishPerDay": {
+      "type": "number",
+      "label": "每天最多发几篇",
+      "description": "默认 1，范围 0~3。0 = 不发帖。建议保持 1：帖子刷多了容易被当成推广号。",
+      "group": "内容"
+    },
+    "diaryReviewEnabled": {
+      "type": "boolean",
+      "label": "定时回顾今天要不要记日记",
+      "description": "打开后，每天到下面两个时间点各回看一次今天聊了什么，判断有没有值得写进日记的事。没有就不写。",
+      "group": "日记"
+    },
+    "diaryReviewTimes": {
+      "type": "string",
+      "label": "回顾时间点",
+      "description": "逗号分隔的 HH:MM，默认 11:00,23:00（中午和睡前）。只在机器人进程运行时生效。",
+      "group": "日记"
+    }
+  }
+}

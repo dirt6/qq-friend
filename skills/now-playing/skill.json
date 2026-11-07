@@ -1,0 +1,44 @@
+{
+  "id": "now-playing",
+  "name": "听歌",
+  "version": "1.0.0",
+  "apiVersion": 1,
+  "category": "media",
+  "entry": "index.js",
+  "description": "看得见老大电脑上正在播的歌：歌名、歌手、专辑、放到第几秒、是播放还是暂停，还能对上当前那一句歌词。聊到音乐、他说在听歌、或者你想接一句歌词的时候用。只读，不控制播放器，也不去点歌。",
+  "author": "本机定制",
+  "enabledByDefault": true,
+  "permissions": [],
+  "settings": {
+    "enabled": true,
+    "includeLyric": true,
+    "timeoutMs": 8000
+  },
+  "configSchema": {
+    "enabled": {
+      "type": "boolean",
+      "label": "启用听歌",
+      "description": "关掉后不再读取电脑上正在播的歌（工具会直接说看不到）。"
+    },
+    "includeLyric": {
+      "type": "boolean",
+      "label": "顺便对一句当前歌词",
+      "description": "打开后，查歌时会再去网易云取歌词，按播放进度找出当前这一句。关掉就只报歌名/歌手/进度，省一次网络请求。"
+    },
+    "timeoutMs": {
+      "type": "number",
+      "label": "读取超时（毫秒）",
+      "description": "读系统媒体会话最多等多久。默认 8000；机器慢可以调大。"
+    }
+  },
+  "prompt": {
+    "sections": [
+      {
+        "id": "now-playing-rule",
+        "title": "听歌",
+        "priority": 44,
+        "content": "【听歌】\n你看得见老大电脑上正在播的歌（网易云的播放状态）。聊到音乐、他说「在听歌」「这歌好听」「你猜我在听什么」，或者你想接一句歌词的时候，用 now_playing 看一眼再自然接话。\n\n· 只在相关时用，不要每首歌都评论——那会变成电台 DJ。\n· 歌词只念一句，别整段念；他说没在听、或者你读不到，就老实说没看到，别编。\n· 别把「第几秒」当报数念出来，除非他明确问进度。"
+      }
+    ]
+  }
+}

@@ -1,0 +1,81 @@
+{
+  "id": "speech-to-text",
+  "name": "语音转文字",
+  "version": "1.0.0",
+  "apiVersion": 1,
+  "category": "media",
+  "description": "把 QQ 语音消息在本地转成文字，再交给机器人正常回复。走的是核心预留的 media.transcribe 能力：插件装好、whisper 配上路径，语音就会变成「[语音转文字] 内容」；没配好时行为完全退回原来的「[语音]」占位，不会报错。全部在本机跑，语音不上传。",
+  "author": "本机定制",
+  "entry": "index.js",
+  "permissions": ["process.spawn"],
+  "enabledByDefault": false,
+  "capabilities": ["media.transcribe"],
+  "settings": {
+    "enabled": false,
+    "engine": "auto",
+    "exePath": "",
+    "modelPath": "",
+    "pythonExe": "",
+    "pythonModel": "base",
+    "language": "zh",
+    "initialPrompt": "",
+    "timeoutMs": 60000
+  },
+  "configSchema": {
+    "enabled": {
+      "type": "boolean",
+      "label": "启用语音转文字",
+      "description": "打开后，收到的语音消息会先转成文字再交给机器人。没配好引擎时会自动退回「[语音]」占位，不报错。",
+      "group": "总开关"
+    },
+    "engine": {
+      "type": "string",
+      "label": "识别引擎",
+      "description": "auto = 配了 whisper-cli 就用它，否则用 Python；whisper-cli = whisper.cpp 的 whisper-cli.exe；python = python -m whisper（需要 pip install openai-whisper）。",
+      "group": "引擎",
+      "enum": ["auto", "whisper-cli", "python"]
+    },
+    "exePath": {
+      "type": "string",
+      "label": "whisper-cli.exe 路径",
+      "description": "whisper.cpp 编译出来的 whisper-cli.exe（旧版叫 main.exe）。例如 D:\\whisper\\whisper-cli.exe。",
+      "group": "引擎"
+    },
+    "modelPath": {
+      "type": "string",
+      "label": "whisper.cpp 模型路径（ggml-*.bin）",
+      "description": "例如 D:\\whisper\\models\\ggml-base.bin。中文建议 base 或 small（small 更准但慢）。",
+      "group": "引擎"
+    },
+    "pythonExe": {
+      "type": "string",
+      "label": "Python 解释器路径（用 python 引擎时）",
+      "description": "例如 C:\\Python311\\python.exe 或 conda 环境的 python.exe。需要先 pip install openai-whisper。",
+      "group": "引擎"
+    },
+    "pythonModel": {
+      "type": "string",
+      "label": "python 引擎用的模型名",
+      "description": "tiny / base / small / medium / large。首次运行会自动下载到用户目录，几百 MB 到 1G，别中途关。",
+      "group": "引擎"
+    },
+    "language": {
+      "type": "string",
+      "label": "语言",
+      "description": "默认 zh。留空 = 自动检测。",
+      "group": "识别"
+    },
+    "initialPrompt": {
+      "type": "string",
+      "label": "转写提示词（默认留空）",
+      "description": "whisper 的 initial prompt。实测它对一两秒的短语音干扰很大（会让识别跑偏，甚至输出一堆星号），所以默认留空。简体问题改由「繁转简」后处理解决，不靠提示词。除非你确定要引导某种转写风格，否则别填。",
+      "group": "识别"
+    },
+    "timeoutMs": {
+      "type": "number",
+      "label": "单条语音最长等多久（毫秒）",
+      "description": "默认 60000（一分钟）。太短会误杀长语音，太长会卡住整轮对话。",
+      "group": "识别"
+    }
+  }
+}

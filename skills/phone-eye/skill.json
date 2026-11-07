@@ -1,0 +1,54 @@
+{
+  "id": "phone-eye",
+  "name": "借来的手机",
+  "version": "1.0.0",
+  "apiVersion": 1,
+  "category": "utility",
+  "entry": "index.js",
+  "description": "老大把一台旧手机（vivo T1x）借给她用。她可以「看一眼」手机屏幕现在有什么：程序负责截屏、OCR、按卡片切分，把结果整理成她能读的几条。只能看，不能点、不能赞、不能评论、不能 @——没有任何写操作。",
+  "author": "本机定制",
+  "enabledByDefault": true,
+  "permissions": [],
+  "settings": {
+    "pythonPath": "E:\\dsh\\AIPhone\\ocr\\venv\\Scripts\\python.exe",
+    "scriptPath": "E:\\dsh\\AIPhone\\phone_eye.py",
+    "defaultApp": "xiaoheihe",
+    "timeoutMs": 180000
+  },
+  "configSchema": {
+    "pythonPath": {
+      "type": "string",
+      "label": "Python 路径",
+      "description": "AIPhone 的 OCR 虚拟环境，默认 E:\\dsh\\AIPhone\\ocr\\venv\\Scripts\\python.exe。",
+      "group": "连接"
+    },
+    "scriptPath": {
+      "type": "string",
+      "label": "手机桥接脚本",
+      "description": "默认 E:\\dsh\\AIPhone\\phone_eye.py。负责 adb 截屏 + OCR + 卡片切分。",
+      "group": "连接"
+    },
+    "defaultApp": {
+      "type": "string",
+      "label": "默认看哪个应用",
+      "description": "目前只有 xiaoheihe。B 站走公开 API，不需要手机。",
+      "group": "连接"
+    },
+    "timeoutMs": {
+      "type": "number",
+      "label": "超时（毫秒）",
+      "description": "默认 180000。截屏+OCR 一般 8～15 秒，慢的时候留足余量。",
+      "group": "连接"
+    }
+  },
+  "prompt": {
+    "sections": [
+      {
+        "id": "phone-eye-rule",
+        "title": "老大借给你的手机",
+        "priority": 44,
+        "content": "【老大借给你的手机】\n老大把一台旧手机（vivo T1x）借给你用。你想知道手机屏幕上现在有什么，可以用 phone_eye__look 看一眼——程序会帮你截图、认字、把内容拆成一条条帖子，你看到的是整理好的文字，不是图。\n\n**能点进去看**：只看标题常常不够。想知道某一条到底在说什么，用 phone_eye__open 点进去（给 index 或标题关键词），会拿到正文和评论区。看完会自动退回列表，不用你管。\n\n**但只能看**：不能点赞、不能评论、不能 @、不能发帖。这些能力没给你，也还没做。老大问起就直说「只能看」。\n\n**别一直刷**：看一次要十几秒，也会让屏幕亮起来。一次看一两条就够，别连着看好几次；没有特别想知道的事就别看。看到有意思的，可以自然地说一句，不用汇报「我看了几条」。\n\n**看不清就说看不清**：切分可能把两条帖子混在一起、也可能把图片里的字当成正文，评论区还会有很多错字。不确定的时候不要硬编，说「屏幕上有点乱，我只看清 xx」。"
+      }
+    ]
+  }
+}

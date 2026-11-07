@@ -1,0 +1,14 @@
+{
+  "id": "her-test",
+  "name": "小鲸鱼的自检工具",
+  "version": "0.1.0",
+  "apiVersion": 1,
+  "category": "utility",
+  "entry": "index.js",
+  "description": "她自己写的第一个小工具：能被调用、能返回当前时间，用来确认「给自己加功能」这条路是通的。",
+  "author": "小鲸鱼",
+  "enabledByDefault": true,
+  "permissions": [],
+  "settings": {},
+  "configSchema": {}
+}

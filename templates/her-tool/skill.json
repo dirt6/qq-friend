@@ -1,0 +1,14 @@
+{
+  "id": "her-example",
+  "name": "例子：她想给自己加的小功能",
+  "version": "0.1.0",
+  "apiVersion": 1,
+  "category": "utility",
+  "entry": "index.js",
+  "description": "这是一份模板，不参与加载（在 templates/ 下）。她想要新能力时，把它复制到 skills/her-<名字>/，改 id 和下面的逻辑。",
+  "author": "模板",
+  "enabledByDefault": true,
+  "permissions": [],
+  "settings": {},
+  "configSchema": {}
+}

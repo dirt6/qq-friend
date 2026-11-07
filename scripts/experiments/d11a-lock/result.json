@@ -1,0 +1,66 @@
+{
+  "tmp": "C:\\Users\\lenovo\\AppData\\Local\\Temp\\dsh-UlqHDU\\d11a-lock-RktyyK",
+  "nolock": {
+    "final": 50,
+    "expected": 100,
+    "a": {
+      "ok": 50,
+      "failed": 0,
+      "firstFailAt": -1,
+      "maxWaitMs": 0,
+      "code": 0
+    },
+    "b": {
+      "ok": 0,
+      "failed": 0,
+      "code": 1
+    },
+    "lost": 50
+  },
+  "wx": {
+    "final": 100,
+    "expected": 100,
+    "a": {
+      "ok": 50,
+      "failed": 0,
+      "firstFailAt": -1,
+      "maxWaitMs": 218,
+      "code": 0
+    },
+    "b": {
+      "ok": 50,
+      "failed": 0,
+      "firstFailAt": -1,
+      "maxWaitMs": 189,
+      "code": 0
+    }
+  },
+  "killRecovery": {
+    "lockPid": 19736,
+    "lockPidStillAlive": false,
+    "recovered": true,
+    "final": 6,
+    "rec": {
+      "ok": 5,
+      "failed": 0,
+      "firstFailAt": -1,
+      "maxWaitMs": 16,
+      "code": 0
+    }
+  },
+  "timeout": {
+    "waiterFailed": true,
+    "waiterOk": 0,
+    "final": 1
+  },
+  "separate": {
+    "a": 30,
+    "b": 30,
+    "aOk": 30,
+    "bOk": 30
+  },
+  "deletedLock": {
+    "intruderOk": 1,
+    "note": "锁文件被删除后互斥失效（用户态锁无法防恶意删除）"
+  }
+}

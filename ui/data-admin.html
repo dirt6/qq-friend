@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>数据管理（只读） · QQ Agent</title>
+  <link rel="stylesheet" href="/style.css" />
+</head>
+<body>
+  <header id="topbar">
+    <div class="brand">数据管理 <span class="brand-sub">只读 · D1-5D</span></div>
+    <div class="top-status">
+      <span class="muted" style="font-size:12px">所有接口只读；无路径 / PID / 命令输入</span>
+      <a class="btn btn-small" href="/" rel="noopener">返回控制台</a>
+    </div>
+  </header>
+
+  <main style="max-width:1180px;margin:0 auto;padding:18px 20px 40px">
+    <div class="card" style="padding:14px 16px;margin-bottom:14px">
+      <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+        <span class="badge" style="background:rgba(46,160,67,.18);color:#3fb950">只读查看 · 已启用</span>
+        <span class="badge" style="background:rgba(56,139,253,.18);color:#58a6ff">生成计划 · 只读</span>
+        <span class="badge" style="background:rgba(210,153,34,.18);color:#d29922">隔离演练 · 仅测试</span>
+        <span class="badge" style="background:rgba(248,81,73,.18);color:#f85149">生产执行 · 未授权</span>
+      </div>
+      <div class="muted" style="font-size:12px;margin-top:8px;line-height:1.7">
+        本页只展示审计/清单/只读计划，不提供删除、隔离、清理、终止进程或生产执行按钮。
+        <b>unknown / historical_unknown / process_unknown</b> 会以风险提示标出，需人工判断。
+      </div>
+    </div>
+
+    <div id="risk-banner" class="card" style="display:none;padding:12px 16px;margin-bottom:14px;border-left:4px solid #d29922"></div>
+
+    <section class="card" style="padding:14px 16px;margin-bottom:14px">
+      <h3 style="margin:0 0 10px;font-size:15px">① 幂等审计</h3>
+      <div id="idem-summary" class="muted" style="font-size:12px">加载中…</div>
+      <div id="idem-table" style="margin-top:10px"></div>
+    </section>
+
+    <section class="card" style="padding:14px 16px;margin-bottom:14px">
+      <h3 style="margin:0 0 10px;font-size:15px">② Diary Trash 备份清单</h3>
+      <div id="trash-summary" class="muted" style="font-size:12px">加载中…</div>
+      <div id="trash-table" style="margin-top:10px"></div>
+    </section>
+
+    <section class="card" style="padding:14px 16px;margin-bottom:14px">
+      <h3 style="margin:0 0 10px;font-size:15px">③ Session 孤儿与归属状态</h3>
+      <div id="session-summary" class="muted" style="font-size:12px">加载中…</div>
+      <div id="session-table" style="margin-top:10px"></div>
+    </section>
+
+    <section class="card" style="padding:14px 16px;margin-bottom:14px">
+      <h3 style="margin:0 0 10px;font-size:15px">④ Reset 备份清单</h3>
+      <div id="backup-summary" class="muted" style="font-size:12px">加载中…</div>
+      <div id="backup-table" style="margin-top:10px"></div>
+    </section>
+
+    <section class="card" style="padding:14px 16px">
+      <h3 style="margin:0 0 10px;font-size:15px">⑤ 数据生命周期审计结果</h3>
+      <div id="lifecycle-summary" class="muted" style="font-size:12px">加载中…</div>
+    </section>
+
+    <p class="muted" style="font-size:11.5px;margin-top:16px;line-height:1.7">
+      页面不提供任意路径、任意命令或任意 PID 输入；所有数据来自只读 API。
+      任何生产清理/隔离/删除/进程终止都必须另行申请授权。
+    </p>
+  </main>
+
+  <script defer src="/data-admin.js"></script>
+</body>
+</html>

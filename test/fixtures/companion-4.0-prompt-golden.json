@@ -1,0 +1,8 @@
+{
+  "schema": 1,
+  "note": "4.0 阶段 0 golden：companion promptSection 的稳定片段；不包含模型/调度输出。",
+  "cases": [
+    { "name": "empty", "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855", "text": "" },
+    { "name": "goal", "sha256": "f0279e3d4e1dfe998f707bf5567780b7d30598a6198fa55f8fac0715e516b1aa", "text": "【你现在】\n现在的方向：D1-7 统一伙伴架构" }
+  ]
+}

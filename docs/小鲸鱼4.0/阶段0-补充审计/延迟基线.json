@@ -1,0 +1,156 @@
+{
+  "at": "2026-10-31T14:52:09.279Z",
+  "dsh": "C:\\Users\\lenovo\\AppData\\Roaming\\npm\\dsh.cmd",
+  "home": "E:\\dsh\\dsh-tmp\\bench-home",
+  "prompt": "只回复两个字：收到",
+  "results": [
+    {
+      "tag": "cold",
+      "ok": true,
+      "code": 0,
+      "ms": {
+        "spawn": 22,
+        "firstEvent": 5362,
+        "final": 6202,
+        "end": 6273
+      },
+      "session": "session-d40ded4e-800a-433b-8a02-087438f41a9f",
+      "text": "收到",
+      "usage": {
+        "inputTokens": 513,
+        "outputTokens": 2,
+        "cacheReadTokens": 5504,
+        "cacheWriteTokens": 0,
+        "totalTokens": 6019
+      },
+      "error": "",
+      "stderr": ""
+    },
+    {
+      "tag": "warm",
+      "ok": true,
+      "code": 0,
+      "ms": {
+        "spawn": 17,
+        "firstEvent": 5157,
+        "final": 6100,
+        "end": 6168
+      },
+      "session": "session-d40ded4e-800a-433b-8a02-087438f41a9f",
+      "text": "收到",
+      "usage": {
+        "inputTokens": 140,
+        "outputTokens": 2,
+        "cacheReadTokens": 5888,
+        "cacheWriteTokens": 0,
+        "totalTokens": 6030
+      },
+      "error": "",
+      "stderr": ""
+    },
+    {
+      "tag": "warm",
+      "ok": true,
+      "code": 0,
+      "ms": {
+        "spawn": 8,
+        "firstEvent": 5119,
+        "final": 5747,
+        "end": 5810
+      },
+      "session": "session-d40ded4e-800a-433b-8a02-087438f41a9f",
+      "text": "收到",
+      "usage": {
+        "inputTokens": 151,
+        "outputTokens": 2,
+        "cacheReadTokens": 5888,
+        "cacheWriteTokens": 0,
+        "totalTokens": 6041
+      },
+      "error": "",
+      "stderr": ""
+    },
+    {
+      "tag": "concurrent-new-a",
+      "ok": true,
+      "code": 0,
+      "ms": {
+        "spawn": 18,
+        "firstEvent": 5296,
+        "final": 5917,
+        "end": 5995
+      },
+      "session": "session-3f06ab97-bb3b-462a-b834-8488bde4d8ae",
+      "text": "收到",
+      "usage": {
+        "inputTokens": 134,
+        "outputTokens": 2,
+        "cacheReadTokens": 5883,
+        "cacheWriteTokens": 0,
+        "totalTokens": 6019
+      },
+      "error": "",
+      "stderr": ""
+    },
+    {
+      "tag": "concurrent-new-b",
+      "ok": true,
+      "code": 0,
+      "ms": {
+        "spawn": 9,
+        "firstEvent": 5303,
+        "final": 6970,
+        "end": 7033
+      },
+      "session": "session-7cd391d1-5ec7-4c7b-a493-c608aa5fe6e7",
+      "text": "收到",
+      "usage": {
+        "inputTokens": 134,
+        "outputTokens": 2,
+        "cacheReadTokens": 5883,
+        "cacheWriteTokens": 0,
+        "totalTokens": 6019
+      },
+      "error": "",
+      "stderr": ""
+    },
+    {
+      "tag": "same-session-a",
+      "ok": true,
+      "code": 0,
+      "ms": {
+        "spawn": 20,
+        "firstEvent": 5398,
+        "final": 6284,
+        "end": 6350
+      },
+      "session": "session-d40ded4e-800a-433b-8a02-087438f41a9f",
+      "text": "收到",
+      "usage": {
+        "inputTokens": 162,
+        "outputTokens": 2,
+        "cacheReadTokens": 5888,
+        "cacheWriteTokens": 0,
+        "totalTokens": 6052
+      },
+      "error": "",
+      "stderr": ""
+    },
+    {
+      "tag": "same-session-b",
+      "ok": false,
+      "code": 1,
+      "ms": {
+        "spawn": 11,
+        "firstEvent": 5378,
+        "final": 0,
+        "end": 5448
+      },
+      "session": "session-d40ded4e-800a-433b-8a02-087438f41a9f",
+      "text": "",
+      "usage": null,
+      "error": "",
+      "stderr": "dsh: session \"session-d40ded4e-800a-433b-8a02-087438f41a9f\" is already owned by an active write handle\n"
+    }
+  ]
+}

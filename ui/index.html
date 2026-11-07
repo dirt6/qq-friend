@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>QQ Agent</title>
+  <!-- 内容安全策略：控制台只应加载本机资源。
+       首屏主题预置脚本必须内联（否则会闪白），用它的 sha256 hash 精确放行 ——
+       不再用 'unsafe-inline'（页面多处 innerHTML 拼接，一旦任何一处被注入，
+       unsafe-inline 会让 onerror= 等内联代码直接执行，CSP 形同虚设）。
+       内联样式仍放行（style-src）：主题/布局大量使用内联 style 属性。
+       2026-09-26 例外：意见收集/金句上传引入阿里云验证码 2.0（防垃圾上传），
+       官方要求必须动态加载 o.alicdn.com 的 SDK 并直连 aliyuncs 验签域，
+       故 script-src / connect-src / frame-src / worker-src 增列对应来源，
+       其余仍锁死在 'self'。 -->
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-HJ5DwBIuT8nMl6SGSb24X9oSvsfDcsGPIkCgmk97V7I=' https://o.alicdn.com https://kondius.cn; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: http: https:; media-src 'self' data: blob:; connect-src 'self' https://kondius.cn https://*.aliyuncs.com https://*.alicdn.com; frame-src https://*.aliyuncs.com https://*.alicdn.com https://kondius.cn; worker-src 'self' blob: https://*.alicdn.com https://kondius.cn; font-src 'self' data:; object-src 'none'; base-uri 'none'; form-action 'none'" />
+  <link rel="stylesheet" href="/style.css" />
+  <script>
+    /* 主题预置：在样式生效前就定好 data-theme，避免首屏闪白/闪黑。
+       只认 dark / light，非法值回退暗色。
+       这里只做"应用"，真正的切换逻辑与持久化在前端脚本。 */
+    (function () {
+      try {
+        var saved = localStorage.getItem('qqa-theme') || '';
+        var theme = (saved === 'light' || saved === 'dark') ? saved : 'dark';
+        document.documentElement.setAttribute('data-theme', theme);
+      } catch (e) {
+        document.documentElement.setAttribute('data-theme', 'dark');
+      }
+    })();
+  </script>
+</head>
+<body>
+  <header id="topbar">
+    <div class="brand">QQ Agent <span class="brand-sub"></span></div>
+    <div class="top-status">
+      <!-- 状态胶囊带：窄窗口下横向滚动（不折行、不裁切）；右侧控件固定可见 -->
+      <div class="top-chips">
+        <span id="onebot-dot" class="dot dot-off" title="OneBot 连接状态"></span>
+        <span id="onebot-label" class="muted">OneBot 未连接</span>
+        <span class="sep"></span>
+        <span id="model-label" class="muted">模型：-</span>
+        <span class="sep"></span>
+        <span id="usage-label" class="muted">今日：-</span>
+        <span class="sep"></span>
+        <span id="search-count-label" class="muted" title="今日联网搜索次数（web_search / web_fetch）">搜索：-</span>
+      </div>
+      <span class="sep"></span>
+      <!-- 就绪进度指示器：4 圆点 = QQ运行 / SnowLuma运行 / OneBot连接 / 配置完成 -->
+      <span id="readiness-dots" class="readiness-dots" title="就绪进度：点击跳转到对应设置">
+        <span class="rdot" data-target="snowluma" title="QQ 内核未运行"></span>
+        <span class="rdot" data-target="snowluma" title="SnowLuma 未运行"></span>
+        <span class="rdot" data-target="snowluma" title="OneBot 未连接"></span>
+        <span class="rdot" data-target="settings" title="配置未完成"></span>
+      </span>
+      <a class="btn btn-small" href="/data-admin.html" target="_blank" rel="noopener" title="数据管理（只读）">数据管理</a>
+      <button id="theme-btn" class="icon-btn" title="切换主题（暗 ↔ 亮）" aria-label="切换主题"></button>
+      <button id="pause-btn" class="btn btn-small">暂停</button>
+    </div>
+  </header>
+
+  <div id="banner" class="banner hidden"></div>
+
+  <div id="loading-overlay" class="loading-overlay">
+    <div class="loading-card">
+      <div class="loading-title">QQ Agent 正在启动</div>
+      <div class="loading-sub" id="loading-status">正在启动 SnowLuma 与 OneBot 服务，请稍候…</div>
+      <div class="loading-spinner"></div>
+      <pre class="loading-logs" id="loading-logs"></pre>
+    </div>
+  </div>
+
+    <nav id="tabs">
+    <button class="tab" data-tab="ops">运维</button>
+    <button class="tab" data-tab="qrlogin">扫码登录</button>
+    <button class="tab active" data-tab="sessions">会话</button>
+    <button class="tab" data-tab="diary">日记</button>
+    <button class="tab" data-tab="memoryadmin">经验管理</button>
+    <button class="tab" data-tab="gallery">图片管理</button>
+    <button class="tab" data-tab="idle">空闲时间</button>
+    <button class="tab" data-tab="modules">工具</button>
+    <button class="tab" data-tab="usage">用量</button>
+    <button class="tab" data-tab="settings">设置</button>
+    <span class="nav-spacer"></span>
+    <button class="nav-btn hidden" id="quote-confirm-btn">确认金句</button>
+    <button class="nav-btn" id="quote-btn" title="把机器人的精彩发言收录到金句墙">金句上传</button>
+    <button class="nav-btn" id="feedback-btn" title="向作者反馈意见和建议">意见收集</button>
+    <button class="nav-btn nav-btn-market" id="skill-market-btn" title="打开 Skill 市场">Skill 市场</button>
+    <button class="nav-btn nav-btn-market" id="plugin-market-btn" title="打开插件市场">插件市场</button>
+    <button class="nav-btn nav-btn-persona" id="persona-plaza-btn" title="打开人设广场">人设广场</button>
+    <button class="nav-btn nav-btn-hot" id="open-site-btn" title="打开 QQ Agent 网站">打开网站！</button>
+    <!-- 重启（2026-11-03 机主：设置下面加一个重启按键）-->
+    <button class="nav-btn" id="nav-restart-btn" title="关闭 QQ Agent（不会自动重启，需要手动重新打开）">关闭</button>
+  
+  </nav>
+
+  <main id="layout">
+    <!-- 会话视图（R7-C B：吸收「存档」）-->
+    <section id="view-sessions" class="view active">
+      <div id="sessions-mode-bar" class="mode-bar">
+        <button class="mode-btn active" data-mode="process" title="看她是怎么想的 —— 系统提示、输入、工具调用、输出">过程</button>
+        <button class="mode-btn" data-mode="content" title="看说了什么 —— 每条消息的收发">内容</button>
+      </div>
+
+      <!-- 过程模式 -->
+      <div id="pane-process" class="mode-pane">
+        <aside id="session-list" class="list-pane">
+          <div class="list-head muted"><span id="session-count"></span><button class="list-head-btn" id="session-broadcast-btn" title="给选中的群/私聊批量发送一条消息">群发</button><button class="list-head-btn" id="session-clear-btn" title="清空全部已结束的会话记录（保留运行中/等待中的）">清空</button></div>
+          <div id="session-items"></div>
+          <div id="session-more" class="list-more muted"></div>
+          <div class="list-resizer" id="session-list-resizer" title="拖动调整侧栏宽度"></div>
+        </aside>
+        <div id="session-detail" class="detail-pane">
+          <div class="empty-hint">← 选择左侧会话查看完整过程</div>
+        </div>
+      </div>
+
+      <!-- 内容模式（原「存档」页，已并入这里）-->
+      <div id="pane-content" class="mode-pane" style="display:none">
+        <aside id="chat-list" class="list-pane">
+          <div class="list-head muted">消息存档</div>
+          <div id="chat-items"></div>
+          <div class="list-resizer" id="chat-list-resizer" title="拖动调整侧栏宽度"></div>
+        </aside>
+        <div id="chat-detail" class="detail-pane">
+          <div class="empty-hint">← 选择会话查看消息存档</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SnowLuma 视图（R7-C B：已从导航移除，DOM 保留以免 JS 报错）-->
+    <section id="view-snowluma" class="view">
+      <div id="snowluma-page" class="snowluma-pane"></div>
+    </section>
+
+    <!-- 记忆视图（R7-C B：已从导航移除，DOM 保留以免 JS 报错）-->
+    <section id="view-memory" class="view">
+      <aside id="memory-list" class="list-pane">
+        <div class="list-head muted">记忆</div>
+        <div id="memory-items"></div>
+        <div class="list-resizer" id="memory-list-resizer" title="拖动调整侧栏宽度"></div>
+      </aside>
+      <div id="memory-detail" class="detail-pane">
+        <div class="empty-hint">← 选择会话查看记忆</div>
+      </div>
+    </section>
+
+    <!-- 用量视图（R7-C B：已从导航移除，DOM 保留 —— 等并入设置子页签）-->
+    <section id="view-usage" class="view">
+      <div id="usage-page" class="usage-pane"></div>
+    </section>
+
+    <!-- 技能 / 插件 / 她的工具（R7-C C：三合一）
+         原来 skills 和 plugins 是两个独立 tab。两者的区别在"谁决定何时执行"
+         （确定性 vs 模型决定），但放着两个 tab 反而看不出这个区别 ——
+         合成一页用切换，对比更直接。她的工具也放这里，因为同属"她有什么能力"。 -->
+    <section id="view-modules" class="view">
+      <!-- 左侧竖排切换（R7-C C2：机主说横着占空间大、不好看）-->
+      <aside id="modules-sidebar" class="modules-sidebar">
+        <button class="module-item active" data-module="skill" title="Skill：确定性工具，由词触发，不花 Token">技能</button>
+        <button class="module-item" data-module="plugin" title="Plugin：模型决定何时执行">插件</button>
+        <button class="module-item" data-module="her" title="她自己写的工具/功能">她的工具</button>
+      </aside>
+      <div id="modules-body" class="modules-body">
+        <div id="skills-page" class="modules-pane"></div>
+        <div id="plugins-page" class="modules-pane" style="display:none"></div>
+        <div id="her-tools-page" class="modules-pane" style="display:none"></div>
+      </div>
+    </section>
+
+    <!-- 设置视图 -->
+    <section id="view-settings" class="view">
+      <aside id="settings-sidebar" class="settings-sidebar"></aside>
+      <div id="settings-form" class="settings-pane"></div>
+    </section>
+
+    <!-- 扫码登录视图（R7 骨架）-->
+    <section id="view-qrlogin" class="view">
+      <div class="detail-pane" style="padding:24px;overflow:auto">
+        <h3 style="margin:0 0 8px">NapCat 扫码登录</h3>
+        <p class="muted" style="margin:0 0 16px;font-size:13px">
+          这张图来自 NapCat 的 <code>cache/qrcode.png</code>，由本机后端只读转发。
+        </p>
+
+        <div id="qr-warning" style="margin-bottom:16px;padding:10px 12px;border-radius:8px;border:1px solid #b8860b;background:rgba(184,134,11,.12);font-size:13px">
+          <strong>⚠️ 二维码有效性尚未验证</strong><br>
+          文件存在且能读已确认，但<strong>会不会随每次扫码更新，还没验证</strong>。<br>
+          在验证之前，<strong>请不要据此判断扫码是否有效</strong>。
+        </div>
+
+        <div id="qr-empty" style="padding:24px;text-align:center;border:1px dashed var(--bd);border-radius:10px">
+          <div class="muted">还没有二维码图片</div>
+          <div class="muted" style="font-size:12px;margin-top:6px">NapCat 可能尚未进入登录流程，或缓存已被清理。</div>
+        </div>
+
+        <div id="qr-box" style="display:none">
+          <div style="display:flex;gap:20px;align-items:flex-start;flex-wrap:wrap">
+            <div id="qr-img-wrap" style="padding:12px;background:#fff;border-radius:10px;line-height:0">
+              <img id="qr-img" alt="登录二维码" style="max-width:320px;max-height:320px;image-rendering:pixelated">
+            </div>
+            <div style="font-size:13px;line-height:1.9">
+              <div>文件更新时间：<span id="qr-mtime" class="muted">—</span></div>
+              <div>文件大小：<span id="qr-size" class="muted">—</span></div>
+              <div style="margin-top:10px">
+                <button class="nav-btn" id="qr-refresh">重新读取</button>
+              </div>
+              <div id="qr-note" class="muted" style="margin-top:10px;font-size:12px;max-width:320px"></div>
+              <div class="muted" style="margin-top:8px;font-size:11.5px;line-height:1.8">
+                扫不出来？试这两个办法：<br>
+                · 用系统看图打开 <code>napcat\shell\napcat\cache\qrcode.png</code><br>
+                · NapCat 黑窗里可以复制二维码的解码 URL，粘到二维码生成网站再扫
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div id="qr-error" style="display:none;margin-top:16px;padding:10px 12px;border-radius:8px;border:1px solid #a33;background:rgba(170,51,51,.12);font-size:13px">
+          <strong>读取失败</strong><div id="qr-error-msg" style="margin-top:6px"></div>
+        </div>
+      </div>
+    </section>
+
+
+    <!-- 记忆管理视图（R7-A）-->
+    <section id="view-memoryadmin" class="view">
+      <div class="detail-pane" style="padding:20px;overflow:auto">
+        <h3 style="margin:0 0 4px">记忆管理</h3>
+        <p class="muted" style="margin:0 0 14px;font-size:12px">
+          经验库的增删改查。所有写操作都会记入 <code>logs/memory-write-audit.jsonl</code>（记录结果，不只是请求）。
+        </p>
+
+        <div id="mem-toast" style="display:none;margin-bottom:12px;padding:8px 12px;border-radius:8px;border:1px solid var(--bd);background:var(--bg2);font-size:13px"></div>
+
+        <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:14px">
+          <select id="mem-filter-status" class="nav-btn" style="padding:6px 10px">
+            <option value="">全部状态</option>
+            <option value="pending">待验证</option>
+            <option value="verified">已验证</option>
+            <option value="stable">稳定</option>
+            <option value="archived">已归档</option>
+          </select>
+          <input id="mem-filter-q" placeholder="按内容搜索…" style="padding:6px 10px;border-radius:6px;border:1px solid var(--bd);background:var(--bg1);color:var(--tx);font-size:13px;min-width:200px">
+          <button class="nav-btn" id="mem-refresh">刷新</button>
+          <button class="nav-btn" id="mem-archive-btn" title="批量归档很久没用的稳定经验">归档过期…</button>
+          <span id="mem-count" class="muted" style="font-size:12px;margin-left:auto"></span>
+        </div>
+        <div id="mem-governance" class="muted" style="font-size:11.5px;margin:0 0 10px"></div>
+
+        <div id="mem-list" style="border:1px solid var(--bd);border-radius:10px;overflow:hidden"></div>
+
+        <details style="margin-top:18px;font-size:12px" class="muted">
+          <summary style="cursor:pointer">这个页面做什么 / 不做什么</summary>
+          <div style="margin-top:8px;line-height:1.9">
+            <div>· <strong>改状态</strong>：pending / verified / stable / archived。升级到 verified/stable 会以 <code>source: 'owner'</code> 记入，表示这是机主在界面上点的。</div>
+            <div>· <strong>改内容</strong>：第一行替换原内容；<strong>其余行会新建为独立条目</strong>；多行时这条会被设回「待验证」。</div>
+            <div>· <strong>归档过期</strong>：<strong>批量</strong>操作，把所有 stable 且超过 N 天没被用到的经验改为 archived（不是删除）。</div>
+            <div>· <strong>删除</strong>：<strong>不可恢复</strong>。会先展示目标 ID + 状态 + 内容摘要，确认后才发送。</div>
+            <div style="margin-top:8px">⚠️ 8899 面板上对应的四个按钮<strong>仍然是 403</strong>（1.5.6 有意退役）。这里是它们的正式去处。</div>
+          </div>
+        </details>
+      </div>
+    </section>
+
+
+    <!-- 运维视图（R7-B）-->
+    <section id="view-ops" class="view">
+      <div class="detail-pane" style="padding:20px;overflow:auto">
+        <h3 style="margin:0 0 4px">运维</h3>
+        <p class="muted" style="margin:0 0 14px;font-size:12px">
+          机器人和 NapCat 的启停与日志。所有操作都记入 <code>data/logs/ops-audit.jsonl</code>。
+        </p>
+
+        <div id="ops-toast" style="display:none;margin-bottom:12px;padding:8px 12px;border-radius:8px;border:1px solid var(--bd);background:var(--bg2);font-size:13px"></div>
+
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px;margin-bottom:16px">
+          <div style="padding:14px;border:1px solid var(--bd);border-radius:10px">
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">
+              <span id="ops-bot-dot" style="width:9px;height:9px;border-radius:50%;background:#888;display:inline-block"></span>
+              <strong style="font-size:13px">机器人</strong>
+              <span id="ops-bot-text" class="muted" style="font-size:12px;margin-left:auto">—</span>
+            </div>
+            <div class="muted" style="font-size:11.5px;line-height:1.8;margin-top:8px">
+              和面板跑在同一个进程里，启停由左侧导航底部的「关闭」控制。
+            </div>
+          </div>
+
+          <div style="padding:14px;border:1px solid var(--bd);border-radius:10px">
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">
+              <span id="ops-napcat-dot" style="width:9px;height:9px;border-radius:50%;background:#888;display:inline-block"></span>
+              <strong style="font-size:13px">NapCat</strong>
+              <span id="ops-napcat-text" class="muted" style="font-size:12px;margin-left:auto">—</span>
+            </div>
+            <div style="display:flex;gap:6px;flex-wrap:wrap">
+              <button class="nav-btn" id="ops-napcat-start">启动 NapCat</button>
+              <button class="nav-btn" id="ops-napcat-stop" style="color:#c55" title="校验通过后杀掉 NapCat 的进程树">关闭 NapCat</button>
+
+            </div>
+            <div class="muted" style="font-size:11px;margin-top:8px;line-height:1.7">
+              启动会弹 UAC，提权方式与原来一致。<br>
+              启动会弹 UAC，提权方式与原来一致。关闭会先校验四条
+              （防自杀 / 进程名白名单 / 系统 PID 保护 / cmd 必须有子进程），
+              只杀 <code>data/napcat.pid</code> 里记录的那个进程树。
+            </div>
+          </div>
+        </div>
+
+        <div style="display:flex;gap:8px;align-items:center;margin-bottom:8px;flex-wrap:wrap">
+          <select id="ops-log-which" class="nav-btn" style="padding:6px 10px">
+            <option value="bot">机器人日志（今天）</option>
+            <option value="gateway">DSH 网关日志</option>
+          </select>
+          <button class="nav-btn" id="ops-log-reload">重新读取</button>
+          <button class="nav-btn" id="ops-refresh">刷新状态</button>
+          <span class="muted" style="font-size:11px;margin-left:auto">自动刷新：5 秒 · <strong>已脱敏</strong></span>
+        </div>
+
+        <pre id="ops-log" style="margin:0;padding:12px;border:1px solid var(--bd);border-radius:10px;background:var(--bg1);font-size:11.5px;line-height:1.6;max-height:420px;overflow:auto;white-space:pre-wrap;word-break:break-all">（加载中…）</pre>
+
+        <details style="margin-top:16px;font-size:12px" class="muted">
+          <summary style="cursor:pointer">这个页面做什么 / 不做什么</summary>
+          <div style="margin-top:8px;line-height:1.9">
+            <div>· <strong>启动/停止/重启机器人</strong>：走 <code>explorer.exe</code> 代启（降权标准做法）；停止只杀 lock 文件里的 PID。</div>
+            <div>· <strong>启动 NapCat</strong>：<code>Start-Process -Verb RunAs</code>，和原来完全一致。</div>
+            <div>· <strong>日志</strong>：只读两个固定文件，显式拒绝任何路径参数；<strong>命中凭据模式的值替换成 ***</strong>，整行是凭据的直接丢弃。</div>
+            <div style="margin-top:8px">❌ <strong>不提供</strong>：面板自重启（那是 8899 的事）、NapCat 停止、"一键全关"（那里按进程名杀 QQ）。</div>
+            <div style="margin-top:8px">⚠️ 3210 目前没有认证（<code>server.token</code> 未配置），这个页面靠来源检查 + JSON 校验 + 明确确认兜底。<strong>不要把它当成权限系统。</strong></div>
+          </div>
+        </details>
+      </div>
+    </section>
+
+
+    <!-- 日记（R7-C D：接真实数据；5.0：左星图 / 右日记）-->
+    <section id="view-diary" class="view">
+      <div class="diary-split" id="diary-split">
+        <div class="diary-map-pane" id="diary-map-pane">
+          <div class="diary-map-bar">
+            <div class="diary-scope" id="diary-scope">
+              <button class="scope-btn active" data-scope="diary">日记</button>
+              <button class="scope-btn" data-scope="all">全部记忆</button>
+            </div>
+            <input id="star-search" class="star-search" placeholder="找一颗星…" autocomplete="off">
+            <button class="nav-btn" id="star-filter-important" title="只看重要">重要</button>
+            <button class="nav-btn" id="star-filter-today" title="只看今天">今天</button>
+            <button class="nav-btn" id="star-stats-btn" title="日记体检">体检</button>
+            <button class="nav-btn" id="star-edit-toggle" title="编辑星图：拖动星星 / 加删旋臂">编辑</button>
+            <button class="nav-btn" id="star-save" title="保存星图修改" style="display:none">保存</button>
+            <button class="nav-btn" id="star-add-topic" title="手动添加一条旋臂">＋旋臂</button>
+            <button class="nav-btn" id="star-export" title="导出今晚的星空">导出</button>
+          </div>
+          <div class="star-canvas-wrap" id="star-canvas-wrap">
+            <canvas id="star-map-canvas"></canvas>
+            <div id="star-empty" class="star-empty" hidden>还没有第一颗星</div>
+            <div id="star-tip" class="star-tip" hidden></div>
+            <div id="star-note" class="star-note"></div>
+            <div id="star-stats" class="star-stats" hidden></div>
+          </div>
+          <div class="diary-map-foot">
+            <span id="star-summary" class="muted">…</span>
+            <span class="muted">滚轮缩放 · 拖动旋转 · 双击复位 · Esc 清除</span>
+          </div>
+        </div>
+        <div class="diary-resizer" id="diary-resizer" title="拖动调整宽度（双击复位）"></div>
+        <div class="diary-list-pane" id="diary-list-pane">
+          <button class="nav-btn diary-collapse" id="diary-collapse" title="收起右栏">›</button>
+          <div id="diary-body"><div class="muted" style="padding:20px">展开中…</div></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 图片管理（R7-C E：接真实数据，竖排切换）-->
+    <section id="view-gallery" class="view">
+      <aside id="gallery-sidebar" class="modules-sidebar">
+        <button class="module-item active" data-gallery="sticker">表情包</button>
+        <button class="module-item" data-gallery="drawing">她的画</button>
+      </aside>
+      <div class="modules-body">
+        <div class="modules-pane" style="padding:20px;overflow:auto">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">
+            <h3 style="margin:0">图片管理</h3>
+            <button class="nav-btn" id="gallery-refresh" style="margin-left:auto">刷新</button>
+          </div>
+          <p class="muted" style="margin:0 0 16px;font-size:12px">只读展示；同步/删除/备注仍在 8899 面板。</p>
+          <div id="gallery-stickers"><div class="muted" style="padding:20px">加载中…</div></div>
+          <div id="gallery-drawings" style="display:none"><div class="muted" style="padding:20px">加载中…</div></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 空闲时间（R7-C F：接真实数据）-->
+    <section id="view-idle" class="view">
+      <div class="detail-pane" style="padding:20px;overflow:auto">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">
+          <h3 style="margin:0">空闲时间</h3>
+          <button class="nav-btn" id="idle-refresh" style="margin-left:auto">刷新</button>
+        </div>
+        <p class="muted" style="margin:0 0 16px;font-size:12px">
+          她一个人时在做什么。数据来自 5.0 空闲调度（系统周期 + 她自己约的醒来）和运行账本；旧插件记录折叠在下方，仅供参考。
+        </p>
+        <div id="idle-body"><div class="muted" style="padding:20px">加载中…</div></div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- M9 拆分：ESM 桥（vendor 模块 → window）先执行；其后 12 段普通脚本按 defer 顺序执行，
+       module 与 defer 共享同一条按文档顺序的延迟队列，保证桥先于 00-core.js。 -->
+  <script type="module" src="/app.js"></script>
+  <script defer src="/app/00-core.js"></script>
+  <script defer src="/app/01-boot.js"></script>
+  <script defer src="/app/02-sse-sessions.js"></script>
+  <script defer src="/app/03-snowluma.js"></script>
+  <script defer src="/app/04-archive-usage.js"></script>
+  <script defer src="/app/05-memory-settings.js"></script>
+  <script defer src="/app/06-settings-render.js"></script>
+  <script defer src="/app/07-settings-events.js"></script>
+  <script defer src="/app/08-modals.js"></script>
+  <script defer src="/app/09-community.js"></script>
+  <script defer src="/app/10-feedback.js"></script>
+  <script defer src="/app/12-concept2-ui.js"></script>
+  <script defer src="/app/13-qr-login.js"></script>
+  <script defer src="/app/14-memory-admin.js"></script>
+  <script defer src="/app/15-ops.js"></script>
+  <script defer src="/app/16-nav-modes.js"></script>
+  <script defer src="/app/17-readonly-pages.js"></script>
+  <script defer src="/app/star-map-core.js"></script>
+  <script defer src="/app/18-star-map.js"></script>
+  <script defer src="/app/11-init.js"></script>
+
+  <!-- 阿里云验证码 2.0（意见收集/金句上传共用）：容器常驻；AliyunCaptchaConfig 与
+       SDK 动态加载都在 10-feedback.js 内（CSP 不放行无 hash 内联脚本）。 -->
+  <div id="captcha-element"></div>
+  <button id="captcha-trigger" type="button" aria-label="人机验证触发器（隐藏元素，SDK 内部使用）" style="position:fixed;left:-9999px;top:0" aria-hidden="true" tabindex="-1"></button>
+</body>
+</html>

@@ -1,0 +1,389 @@
+{
+  "tmp": "C:\\Users\\lenovo\\AppData\\Local\\Temp\\dsh-UlqHDU\\d11a-port-K25m4h",
+  "runsPerExperiment": 5,
+  "bindSamePort": {
+    "port": 42935,
+    "rows": [
+      {
+        "aOk": true,
+        "bOk": false,
+        "bCode": "EADDRINUSE"
+      },
+      {
+        "aOk": true,
+        "bOk": false,
+        "bCode": "EADDRINUSE"
+      },
+      {
+        "aOk": true,
+        "bOk": false,
+        "bCode": "EADDRINUSE"
+      },
+      {
+        "aOk": true,
+        "bOk": false,
+        "bCode": "EADDRINUSE"
+      },
+      {
+        "aOk": true,
+        "bOk": false,
+        "bCode": "EADDRINUSE"
+      }
+    ],
+    "pass": true
+  },
+  "contention": {
+    "rows": [
+      {
+        "holderOk": 1,
+        "waiterOk": 0,
+        "waiterFailed": 1,
+        "count": 0
+      },
+      {
+        "holderOk": 1,
+        "waiterOk": 0,
+        "waiterFailed": 1,
+        "count": 0
+      },
+      {
+        "holderOk": 1,
+        "waiterOk": 0,
+        "waiterFailed": 1,
+        "count": 0
+      },
+      {
+        "holderOk": 1,
+        "waiterOk": 0,
+        "waiterFailed": 1,
+        "count": 0
+      },
+      {
+        "holderOk": 1,
+        "waiterOk": 0,
+        "waiterFailed": 1,
+        "count": 0
+      }
+    ],
+    "pass": true
+  },
+  "normalExit": {
+    "rows": [
+      {
+        "holderOk": 1,
+        "secondOk": 1,
+        "count": 1
+      },
+      {
+        "holderOk": 1,
+        "secondOk": 1,
+        "count": 1
+      },
+      {
+        "holderOk": 1,
+        "secondOk": 1,
+        "count": 1
+      },
+      {
+        "holderOk": 1,
+        "secondOk": 1,
+        "count": 1
+      },
+      {
+        "holderOk": 1,
+        "secondOk": 1,
+        "count": 1
+      }
+    ],
+    "pass": true
+  },
+  "killRecovery": {
+    "rows": [
+      {
+        "recOk": 2,
+        "recFailed": 0,
+        "count": 3
+      },
+      {
+        "recOk": 2,
+        "recFailed": 0,
+        "count": 3
+      },
+      {
+        "recOk": 2,
+        "recFailed": 0,
+        "count": 3
+      },
+      {
+        "recOk": 2,
+        "recFailed": 0,
+        "count": 3
+      },
+      {
+        "recOk": 2,
+        "recFailed": 0,
+        "count": 3
+      }
+    ],
+    "pass": true
+  },
+  "timeoutNoWrite": {
+    "rows": [
+      {
+        "failed": 1,
+        "ok": 0,
+        "count": 0
+      },
+      {
+        "failed": 1,
+        "ok": 0,
+        "count": 0
+      },
+      {
+        "failed": 1,
+        "ok": 0,
+        "count": 0
+      },
+      {
+        "failed": 1,
+        "ok": 0,
+        "count": 0
+      },
+      {
+        "failed": 1,
+        "ok": 0,
+        "count": 0
+      }
+    ],
+    "pass": true
+  },
+  "differentFiles": {
+    "pair": {
+      "a": "f0",
+      "b": "f1"
+    },
+    "rows": [
+      {
+        "aOk": 1,
+        "bOk": 1,
+        "aPort": 42247,
+        "bPort": 42014,
+        "portsDiffer": true,
+        "elapsed": 421
+      },
+      {
+        "aOk": 1,
+        "bOk": 1,
+        "aPort": 42247,
+        "bPort": 42014,
+        "portsDiffer": true,
+        "elapsed": 416
+      },
+      {
+        "aOk": 1,
+        "bOk": 1,
+        "aPort": 42247,
+        "bPort": 42014,
+        "portsDiffer": true,
+        "elapsed": 420
+      },
+      {
+        "aOk": 1,
+        "bOk": 1,
+        "aPort": 42247,
+        "bPort": 42014,
+        "portsDiffer": true,
+        "elapsed": 414
+      },
+      {
+        "aOk": 1,
+        "bOk": 1,
+        "aPort": 42247,
+        "bPort": 42014,
+        "portsDiffer": true,
+        "elapsed": 416
+      }
+    ],
+    "pass": true
+  },
+  "collision": {
+    "pair": {
+      "a": "f61",
+      "b": "f72",
+      "port": 42130
+    },
+    "rows": [
+      {
+        "aOk": 1,
+        "bOk": 1,
+        "samePort": true,
+        "elapsed": 762
+      },
+      {
+        "aOk": 1,
+        "bOk": 1,
+        "samePort": true,
+        "elapsed": 732
+      },
+      {
+        "aOk": 1,
+        "bOk": 1,
+        "samePort": true,
+        "elapsed": 761
+      },
+      {
+        "aOk": 1,
+        "bOk": 1,
+        "samePort": true,
+        "elapsed": 763
+      },
+      {
+        "aOk": 1,
+        "bOk": 1,
+        "samePort": true,
+        "elapsed": 734
+      }
+    ],
+    "pass": true
+  },
+  "occupied": {
+    "port": 42877,
+    "rows": [
+      {
+        "occupied": true,
+        "wOk": 0,
+        "wFailed": 1,
+        "errors": [
+          "EPORTLOCK:EADDRINUSE"
+        ],
+        "count": 0
+      },
+      {
+        "occupied": true,
+        "wOk": 0,
+        "wFailed": 1,
+        "errors": [
+          "EPORTLOCK:EADDRINUSE"
+        ],
+        "count": 0
+      },
+      {
+        "occupied": true,
+        "wOk": 0,
+        "wFailed": 1,
+        "errors": [
+          "EPORTLOCK:EADDRINUSE"
+        ],
+        "count": 0
+      },
+      {
+        "occupied": true,
+        "wOk": 0,
+        "wFailed": 1,
+        "errors": [
+          "EPORTLOCK:EADDRINUSE"
+        ],
+        "count": 0
+      },
+      {
+        "occupied": true,
+        "wOk": 0,
+        "wFailed": 1,
+        "errors": [
+          "EPORTLOCK:EADDRINUSE"
+        ],
+        "count": 0
+      }
+    ],
+    "pass": true
+  },
+  "concurrentCounter": {
+    "rows": [
+      {
+        "aOk": 50,
+        "bOk": 50,
+        "final": 100
+      },
+      {
+        "aOk": 50,
+        "bOk": 50,
+        "final": 100
+      },
+      {
+        "aOk": 50,
+        "bOk": 50,
+        "final": 100
+      },
+      {
+        "aOk": 50,
+        "bOk": 50,
+        "final": 100
+      },
+      {
+        "aOk": 50,
+        "bOk": 50,
+        "final": 100
+      }
+    ],
+    "pass": true
+  },
+  "crashConsistency": {
+    "rows": [
+      {
+        "parseable": true,
+        "count": 1,
+        "recOk": 1,
+        "final": 2
+      },
+      {
+        "parseable": true,
+        "count": 1,
+        "recOk": 1,
+        "final": 2
+      },
+      {
+        "parseable": true,
+        "count": 1,
+        "recOk": 1,
+        "final": 2
+      },
+      {
+        "parseable": true,
+        "count": 1,
+        "recOk": 1,
+        "final": 2
+      },
+      {
+        "parseable": true,
+        "count": 1,
+        "recOk": 1,
+        "final": 2
+      }
+    ],
+    "pass": true
+  },
+  "resourceClose": {
+    "rows": [
+      {
+        "rebindOk": true
+      },
+      {
+        "rebindOk": true
+      },
+      {
+        "rebindOk": true
+      },
+      {
+        "rebindOk": true
+      },
+      {
+        "rebindOk": true
+      }
+    ],
+    "pass": true
+  },
+  "sampleMapping": {
+    "normalized": "c:\\users\\lenovo\\appdata\\local\\temp\\dsh-ulqhdu\\d11a-port-k25m4h\\sample.json",
+    "port": 42427
+  }
+}

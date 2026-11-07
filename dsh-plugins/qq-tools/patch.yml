@@ -1,0 +1,3 @@
+- insert:
+    - id: qq-tools
+      name: 'file:///E:/dsh/QQ-agent/dsh-plugins/qq-tools/index.mjs'

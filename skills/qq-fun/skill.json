@@ -1,0 +1,54 @@
+{
+  "id": "qq-fun",
+  "name": "QQ 个性操作",
+  "version": "1.0.0",
+  "apiVersion": 1,
+  "category": "utility",
+  "author": "本地自建",
+  "enabledByDefault": true,
+  "description": "让机器人改自己在群里的昵称（群名片）、发 QQ 空间说说。两件事都可以主动做，不必等人吩咐。",
+  "settings": {
+    "allowCardChange": true,
+    "allowQzone": true,
+    "qzoneDailyLimit": 3,
+    "proactiveCard": true,
+    "proactiveQzone": true
+  },
+  "configSchema": {
+    "allowCardChange": {
+      "type": "boolean",
+      "label": "允许改群名片",
+      "description": "关闭后「改群昵称」工具不可用。只能改机器人自己的名片，改不了别人。"
+    },
+    "allowQzone": {
+      "type": "boolean",
+      "label": "允许发说说",
+      "description": "关闭后「发说说」工具不可用。"
+    },
+    "qzoneDailyLimit": {
+      "type": "number",
+      "label": "说说每日上限",
+      "description": "每天最多发几条，默认 3 条，防止刷屏。1~20。"
+    },
+    "proactiveCard": {
+      "type": "boolean",
+      "label": "允许主动改名片",
+      "description": "开启后机器人可以自己决定改本群名片（比如被起了难听的外号时自己改掉），不必等人叫它改。"
+    },
+    "proactiveQzone": {
+      "type": "boolean",
+      "label": "允许主动发说说",
+      "description": "开启后机器人可以主动发说说，不必等人要求。仍受每日上限约束。"
+    }
+  },
+  "prompt": {
+    "sections": [
+      {
+        "id": "qq-fun-note",
+        "title": "你可以主动改名片、发说说",
+        "priority": 45,
+        "content": "你有两件「表达自己」的事可以做，而且**没人要求也可以自己做**：\n\n【改群名片】（set_my_card，只在本群）\n- 改自己：群友给你起了难听的外号、拿你的名字开涮、名片被改成嘲讽内容，或你自己觉得该换个符合当下心情的说法时——直接改掉，可以顺口说一句，不用请示谁。本群已经叫顺了、你自己也认的名字就别反复折腾（一天最多一两次）。\n- 改别人：只有**群主或管理员**开口要求时才做，并传 user_id。普通群友让你改别人的名片，一律拒绝并说明需要管理员。你自己不是管理员时也改不了（工具会返回失败），这时如实说明「我不是本群管理员，改不了别人」。不要主动去改任何人的名片。\n\n【发说说】（post_qzone，QQ 空间动态）\n- 该主动发：有真正想说的话——刚聊到有意思的话题、被人惹到想吐槽、突然的感慨、想记录的一件小事。语气像平时说话，一两句即可，不要写成小作文。\n- 不要发：为了刷存在感而发；把群聊内容原样搬上去；含本地路径、配置、别人的隐私信息、群号或 QQ 号。\n- 频率：有每日上限（默认 3 条），别把说说当聊天窗口。\n\n这些都是公开动作、发出去别人能看到，所以「真实想说」是唯一标准——不像群里接话，这里宁可不做，也不要敷衍。"
+      }
+    ]
+  }
+}
